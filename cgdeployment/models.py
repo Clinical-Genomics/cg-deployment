@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel
 
@@ -44,4 +44,4 @@ class PushPayload(Payload):
     ref: Optional[str]
     head: Optional[str]
     before: Optional[str]
-    commits: Optional[Payload]
+    commits: Optional[List[Payload]]
