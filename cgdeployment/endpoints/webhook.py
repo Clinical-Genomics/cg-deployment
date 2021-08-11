@@ -1,4 +1,4 @@
-from typing import Optional
+import pprint
 
 from cgdeployment.models import (
     PushPayload,
@@ -27,33 +27,40 @@ def inform_error(request, exc):
 @app.post("/push")
 async def payload(payload: PushPayload):
     print("push post")
-    print(payload)
+    pprint.pp(payload.dict())
     return Response(status_code=200)
 
 
 @app.post("/issue_comment")
 async def payload(payload: IssueCommentsPayload):
     print("issue comment post")
-    print(payload)
+    pprint.pp(payload.dict())
     return Response(status_code=200)
 
 
 @app.post("/release")
 async def payload(payload: ReleasePayload):
     print("release post")
-    print(payload)
+    pprint.pp(payload.dict())
     return Response(status_code=200)
 
 
 @app.post("/pull_request")
 async def payload(payload: PullRequestPayload):
     print("pull request post")
-    print(payload)
+    pprint.pp(payload.dict())
     return Response(status_code=200)
 
 
 @app.post("/issues")
 async def payload(payload: IssuesPayload):
     print("issue post")
-    print(payload)
+    pprint.pp(payload.dict())
+    return Response(status_code=200)
+
+
+@app.post("/deployment")
+async def payload(payload: Payload):
+    print("deployment post")
+    pprint.pp(payload.dict())
     return Response(status_code=200)
