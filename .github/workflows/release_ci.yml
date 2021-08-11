@@ -32,4 +32,4 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: "clinicalgenomics/cg-deployment:${{github.event.release.tag_name}}, clinicalgenomics/cg-deployment:latest"
+          tags: "clinicalgenomics/cg-deployment:${{github.event.release.tag_name}}, clinicalgenomics/cg-deployment:latest, clinicalgenomics/cg-deployment-stage:${{github.event.release.tag_name}}"
