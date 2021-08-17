@@ -35,6 +35,7 @@ async def payload(payload: PushPayload):
 async def payload(payload: IssueCommentsPayload):
     print("issue comment post")
     pprint.pp(payload.dict())
+
     return Response(status_code=200)
 
 
