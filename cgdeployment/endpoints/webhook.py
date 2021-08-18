@@ -1,22 +1,58 @@
 import pprint
+import json
+import hmac
+import hashlib
 
+import requests
 from cgdeployment.config import EnvConfig
 from cgdeployment.models import (
-    Payload,
-    PushPayload,
-    IssuesPayload,
-    IssueCommentsPayload,
-    ReleasePayload,
-    PullRequestPayload,
     DeploymentPayload,
 )
-from cgdeployment.utils import parse_pull_request_trigger, create_deployment, set_deployment_state
-from fastapi import FastAPI, File, Form, HTTPException, Response, UploadFile, Request
-from pydantic import NameEmail, BaseSettings, BaseModel
+from fastapi import FastAPI, HTTPException, Response, Request
+
 from starlette.responses import PlainTextResponse
 
 app = FastAPI()
 envconfig = EnvConfig()
+
+content_types = {
+    "inactive": "application/vnd.github.ant-man-preview+json",
+    "in_progress": "application/vnd.github.flash-preview+json",
+    "queued": "application/vnd.github.flash-preview+json",
+    "error": "application/vnd.github.v3+json",
+    "failure": "application/vnd.github.v3+json",
+    "pending": "application/vnd.github.v3+json",
+    "success": "application/vnd.github.v3+json",
+}
+
+
+def set_deployment_state(payload: DeploymentPayload, state: str):
+    deployment_url: str = f"{payload.deployment.get('url')}/statuses"
+    response = requests.post(
+        url=deployment_url,
+        data=json.dumps(
+            {
+                "state": state,
+            }
+        ),
+        headers={
+            "content-type": content_types.get(state),
+            "authorization": f"token {envconfig.authorization_token}",
+        },
+    )
+    print(response.text)
+
+
+async def verify_signature(
+    request: Request,
+):
+    digester = hmac.new(key=envconfig.webhook_token.encode(), digestmod=hashlib.sha256)
+    request_body = await request.body()
+    digester.update(request_body)
+    received_digest = request.headers.get("x-hub-signature-256")
+    expected_digest = "sha256=" + digester.hexdigest()
+    if not received_digest == expected_digest:
+        raise HTTPException(status_code=401, detail="Invalid SHA signature")
 
 
 @app.exception_handler(HTTPException)
@@ -24,48 +60,9 @@ def inform_error(request, exc):
     return PlainTextResponse(str(exc.detail), status_code=exc.status_code)
 
 
-@app.post("/push")
-async def payload(payload: PushPayload):
-    print("push post")
-    pprint.pp(payload.dict())
-    return Response(status_code=200)
-
-
-@app.post("/issue_comment")
-async def payload(payload: IssueCommentsPayload):
-    print("issue comment post")
-    pprint.pp(payload.dict())
-
-    return Response(status_code=200)
-
-
-@app.post("/release")
-async def payload(payload: ReleasePayload):
-    print("release post")
-    pprint.pp(payload.dict())
-    return Response(status_code=200)
-
-
-@app.post("/pull_request")
-async def payload(payload: PullRequestPayload):
-    if parse_pull_request_trigger(payload=payload):
-        create_deployment(payload=payload)
-
-    print("pull request post")
-    pprint.pp(payload.dict())
-    return Response(status_code=200)
-
-
-@app.post("/issues")
-async def payload(payload: IssuesPayload):
-    print("issue post")
-    pprint.pp(payload.dict())
-    return Response(status_code=200)
-
-
 @app.post("/deployment")
-async def payload(payload: DeploymentPayload):
-    print("deployment post")
+async def payload(payload: DeploymentPayload, request: Request):
+    await verify_signature(request=request)
     pprint.pp(payload.dict())
     set_deployment_state(payload=payload, state="success")
     return Response(status_code=200)
