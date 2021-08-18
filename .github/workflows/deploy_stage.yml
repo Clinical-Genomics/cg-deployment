@@ -22,4 +22,5 @@ jobs:
             https://api.github.com/repos/${{ github.repository }}/deployments \
             -d '{
             "ref": "${{ github.event.inputs.branch_name }}",
-            "environment": "stage"}'
+            "environment": "stage",
+            "auto_merge": false}'
