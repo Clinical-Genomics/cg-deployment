@@ -15,6 +15,7 @@ jobs:
     steps:
       - run: |
           curl \
+            --fail \
             -X POST \
             -H "Accept: application/vnd.github.v3+json" \
             -H "Authorization: token ${{ secrets.BUMPVERSION_TOKEN }}" \
