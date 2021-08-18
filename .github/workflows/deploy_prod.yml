@@ -1,12 +1,12 @@
 ---
 
-name: Deploy branch to staging environment
+name: Deploy release to production environment
 
 on:
   workflow_dispatch:
     inputs:
-      branch_name:
-        description: 'Branch name'
+      tag_name:
+        description: 'Release tag'
 
 
 jobs:
@@ -20,5 +20,5 @@ jobs:
             -H "Authorization: token ${{ secrets.BUMPVERSION_TOKEN }}" \
             https://api.github.com/repos/${{ github.repository }}/deployments \
             -d '{
-            "ref": "${{ github.event.inputs.branch_name }}",
-            "environment": "stage"}'
+            "ref": "${{ github.event.inputs.tag_name }}",
+            "environment": "production"}'
