@@ -115,8 +115,8 @@ class IssuesPayload(Payload):
 class PullRequestPayload(Payload):
     action: Optional[str]
     number: Optional[int]
-    changes: Optional[Payload]
-    pull_request: Optional[Payload]
+    changes: Optional[dict]
+    pull_request: Optional[dict]
 
 
 class PushPayload(Payload):
@@ -127,3 +127,13 @@ class PushPayload(Payload):
     head: Optional[str]
     before: Optional[str]
     commits: Optional[List[Payload]]
+
+
+class DeploymentPayload(Payload):
+    workflow_run: Optional[str]
+    workflow: Optional[str]
+    organization: Optional[dict]
+    action: Optional[str]
+    sender: Optional[dict]
+    repository: Optional[dict]
+    deployment: Optional[dict]

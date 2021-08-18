@@ -1,22 +1,22 @@
 import pprint
 
+from cgdeployment.config import EnvConfig
 from cgdeployment.models import (
+    Payload,
     PushPayload,
     IssuesPayload,
     IssueCommentsPayload,
     ReleasePayload,
     PullRequestPayload,
+    DeploymentPayload,
 )
+from cgdeployment.utils import parse_pull_request_trigger, create_deployment, set_deployment_state
 from fastapi import FastAPI, File, Form, HTTPException, Response, UploadFile, Request
 from pydantic import NameEmail, BaseSettings, BaseModel
 from starlette.responses import PlainTextResponse
 
 app = FastAPI()
-
-
-class Payload(BaseModel):
-    class Config:
-        extra = "allow"
+envconfig = EnvConfig()
 
 
 @app.exception_handler(HTTPException)
@@ -35,6 +35,7 @@ async def payload(payload: PushPayload):
 async def payload(payload: IssueCommentsPayload):
     print("issue comment post")
     pprint.pp(payload.dict())
+
     return Response(status_code=200)
 
 
@@ -47,6 +48,9 @@ async def payload(payload: ReleasePayload):
 
 @app.post("/pull_request")
 async def payload(payload: PullRequestPayload):
+    if parse_pull_request_trigger(payload=payload):
+        create_deployment(payload=payload)
+
     print("pull request post")
     pprint.pp(payload.dict())
     return Response(status_code=200)
@@ -60,7 +64,8 @@ async def payload(payload: IssuesPayload):
 
 
 @app.post("/deployment")
-async def payload(payload: Payload):
+async def payload(payload: DeploymentPayload):
     print("deployment post")
     pprint.pp(payload.dict())
+    set_deployment_state(payload=payload, state="success")
     return Response(status_code=200)

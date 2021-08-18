@@ -10,6 +10,8 @@
 
 -
 
+**Tests and Deployment**
+- [ ] Deploy Stage
 
 **Steps to consider while deploying**
 - Configuration changes:
