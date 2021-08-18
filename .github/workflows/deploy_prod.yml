@@ -22,4 +22,5 @@ jobs:
             https://api.github.com/repos/${{ github.repository }}/deployments \
             -d '{
             "ref": "${{ github.event.inputs.tag_name }}",
-            "environment": "production"}'
+            "environment": "production",
+            "auto_merge": false}'
