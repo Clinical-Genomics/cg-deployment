@@ -17,3 +17,8 @@ class DeploymentPayload(Payload):
     sender: Optional[dict]
     repository: Optional[dict]
     deployment: Optional[dict]
+
+
+class StatusPayload(Payload):
+    status_url: Optional[str]
+    status: Optional[str]

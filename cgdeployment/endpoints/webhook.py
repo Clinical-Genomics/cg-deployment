@@ -2,11 +2,13 @@ import pprint
 import json
 import hmac
 import hashlib
+from typing import List
 
 import requests
 from cgdeployment.config import EnvConfig
 from cgdeployment.models import (
     DeploymentPayload,
+    StatusPayload,
 )
 from fastapi import FastAPI, HTTPException, Response, Request
 
@@ -23,24 +25,39 @@ content_types = {
     "failure": "application/vnd.github.v3+json",
     "pending": "application/vnd.github.v3+json",
     "success": "application/vnd.github.v3+json",
+    "abandoned": "application/vnd.github.v3+json",
 }
 
 
-def set_deployment_state(payload: DeploymentPayload, state: str):
-    deployment_url: str = f"{payload.deployment.get('url')}/statuses"
+def set_deployment_state(status_url: str, state: str):
+
     response = requests.post(
-        url=deployment_url,
+        url=status_url,
         data=json.dumps(
             {
+                "environment": "stage",
                 "state": state,
             }
         ),
         headers={
-            "content-type": content_types.get(state),
+            "accept": content_types.get(state),
             "authorization": f"token {envconfig.authorization_token}",
         },
     )
-    print(response.text)
+    pprint.pp(json.loads(response.text))
+
+
+def get_latest_deployments(payload: DeploymentPayload) -> List[DeploymentPayload]:
+    environment: str = payload.deployment.get("environment")
+    deployments_url: str = payload.repository.get("deployments_url")
+    response = requests.get(
+        url=deployments_url,
+        params={"environment": environment, "per_page": 5},
+        headers={
+            "authorization": f"token {envconfig.authorization_token}",
+        },
+    )
+    return [DeploymentPayload(deployment=deployment) for deployment in json.loads(response.text)]
 
 
 async def verify_signature(
@@ -51,7 +68,16 @@ async def verify_signature(
     digester.update(request_body)
     received_digest = request.headers.get("x-hub-signature-256")
     expected_digest = "sha256=" + digester.hexdigest()
-    if not received_digest == expected_digest:
+    if received_digest != expected_digest:
+        raise HTTPException(status_code=401, detail="Invalid SHA signature")
+
+
+async def verify_token(
+    request: Request,
+):
+    expected_token = " token " + envconfig.authorization_token
+    received_token = request.headers.get("Authorization")
+    if expected_token != received_token:
         raise HTTPException(status_code=401, detail="Invalid SHA signature")
 
 
@@ -61,8 +87,18 @@ def inform_error(request, exc):
 
 
 @app.post("/deployment")
-async def payload(payload: DeploymentPayload, request: Request):
+async def deployment(payload: DeploymentPayload, request: Request):
     await verify_signature(request=request)
     pprint.pp(payload.dict())
-    set_deployment_state(payload=payload, state="success")
+    deployments: List[DeploymentPayload] = get_latest_deployments(payload=payload)
+    for deployment in deployments:
+        set_deployment_state(status_url=deployment.deployment.get("statuses_url"), state="inactive")
+    set_deployment_state(status_url=payload.deployment.get("statuses_url"), state="in_progress")
+    return Response(status_code=200)
+
+
+@app.post("/status")
+async def status(payload: StatusPayload, request: Request):
+    await verify_token(request=request)
+    set_deployment_state(status_url=payload.status_url, state=payload.status)
     return Response(status_code=200)
