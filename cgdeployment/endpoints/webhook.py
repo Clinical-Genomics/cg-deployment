@@ -2,6 +2,8 @@ import pprint
 import json
 import hmac
 import hashlib
+import time
+from pathlib import Path
 from typing import List
 
 import requests
@@ -35,7 +37,6 @@ def set_deployment_state(status_url: str, state: str):
         url=status_url,
         data=json.dumps(
             {
-                "environment": "stage",
                 "state": state,
             }
         ),
@@ -75,10 +76,41 @@ async def verify_signature(
 async def verify_token(
     request: Request,
 ):
-    expected_token = " token " + envconfig.authorization_token
+    expected_token = "token " + envconfig.authorization_token
     received_token = request.headers.get("Authorization")
     if expected_token != received_token:
-        raise HTTPException(status_code=401, detail="Invalid SHA signature")
+        raise HTTPException(status_code=401, detail="Invalid token signature")
+
+
+config_template = """ENVIRONMENT={environment}
+CONTAINER={container}
+TAG={tag}
+DEPLOYMENT_ID={deployment_id}
+STATUS_URL={status_url}
+TOKEN={token}
+"""
+
+
+async def update_trigger_file(payload: DeploymentPayload):
+    environment = payload.deployment.get("environment")
+    containers = payload.deployment.get("description").split(",")
+    tag = payload.deployment.get("ref")
+    deployment_id = payload.deployment.get("id")
+    status_url = payload.deployment.get("statuses_url")
+    trigger_path = Path(envconfig.triggers_dir, "deploy").with_suffix(".conf")
+    for container in containers:
+        with open(trigger_path, "w") as deploy_config:
+            deploy_config.write(
+                config_template.format(
+                    environment=environment,
+                    container=container,
+                    tag=tag,
+                    deployment_id=deployment_id,
+                    status_url=status_url,
+                    token=envconfig.authorization_token,
+                )
+            )
+        time.sleep(60)
 
 
 @app.exception_handler(HTTPException)
@@ -90,10 +122,13 @@ def inform_error(request, exc):
 async def deployment(payload: DeploymentPayload, request: Request):
     await verify_signature(request=request)
     pprint.pp(payload.dict())
+    if payload.deployment.get("environment") not in envconfig.environments:
+        return Response(status_code=200)
     deployments: List[DeploymentPayload] = get_latest_deployments(payload=payload)
     for deployment in deployments:
         set_deployment_state(status_url=deployment.deployment.get("statuses_url"), state="inactive")
     set_deployment_state(status_url=payload.deployment.get("statuses_url"), state="in_progress")
+    await update_trigger_file(payload=payload)
     return Response(status_code=200)
 
 
