@@ -7,8 +7,8 @@ from pathlib import Path
 from typing import List
 
 import requests
-from cgdeployment.config import EnvConfig
-from cgdeployment.models import (
+from cg_deployment.config import EnvConfig
+from cg_deployment.models import (
     DeploymentPayload,
     StatusPayload,
 )

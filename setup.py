@@ -12,12 +12,12 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name="cg-deployment",
+    name="cg_deployment",
     version="0.1.8",
     description="API for deployment of services via webhooks",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Clinical-Genomics/sendmail-container",
+    url="https://github.com/Clinical-Genomics/cg-deployment",
     author="Maria Ropat",
     author_email="maria.ropat@scilifelab.se",
     install_requires=install_requires,

@@ -33,4 +33,4 @@ CMD gunicorn \
     --access-logfile - \
     --log-level="debug" \
     --worker-class=uvicorn.workers.UvicornWorker \
-     cgdeployment.app:app
+     cg_deployment:app
