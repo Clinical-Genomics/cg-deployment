@@ -92,7 +92,7 @@ TOKEN={token}
 
 async def update_trigger_file(payload: DeploymentPayload):
     environment = payload.deployment.get("environment")
-    container = payload.deployment.get("description").split(",")
+    container = payload.deployment.get("description")
     tag = payload.deployment.get("ref")
     deployment_id = payload.deployment.get("id")
     status_url = payload.deployment.get("statuses_url")
