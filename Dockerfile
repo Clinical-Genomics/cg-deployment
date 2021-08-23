@@ -12,7 +12,7 @@ ENV GUNICORN_TIMEOUT=400
 ENV AUTHORIZATION_TOKEN="fqojqfjqnoffnqop2e"
 ENV WEBHOOK_TOKEN="fjofj2ofj23o"
 ENV TRIGGERS_DIR="/path/to/triggers/dir"
-ENV ENVIRONMENTS="stage,preprod"
+ENV ENVIRONMENTS="stage"
 
 EXPOSE 8000
 
