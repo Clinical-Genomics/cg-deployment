@@ -2,7 +2,6 @@ import pprint
 import json
 import hmac
 import hashlib
-import time
 from pathlib import Path
 from typing import List
 
@@ -97,9 +96,7 @@ async def update_trigger_file(payload: DeploymentPayload):
     tag = payload.deployment.get("ref")
     deployment_id = payload.deployment.get("id")
     status_url = payload.deployment.get("statuses_url")
-    trigger_path = Path(envconfig.triggers_dir, container).with_suffix(
-        ".conf"
-    )
+    trigger_path = Path(envconfig.triggers_dir, container).with_suffix(".conf")
 
     with open(trigger_path, "w") as deploy_config:
         deploy_config.write(
@@ -111,6 +108,7 @@ async def update_trigger_file(payload: DeploymentPayload):
                 status_url=status_url,
                 token=envconfig.authorization_token,
             )
+        )
 
 
 @app.exception_handler(HTTPException)
