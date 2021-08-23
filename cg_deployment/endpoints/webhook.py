@@ -93,24 +93,24 @@ TOKEN={token}
 
 async def update_trigger_file(payload: DeploymentPayload):
     environment = payload.deployment.get("environment")
-    containers = payload.deployment.get("description").split(",")
+    container = payload.deployment.get("description").split(",")
     tag = payload.deployment.get("ref")
     deployment_id = payload.deployment.get("id")
     status_url = payload.deployment.get("statuses_url")
-    trigger_path = Path(envconfig.triggers_dir, "deploy").with_suffix(".conf")
-    for container in containers:
-        with open(trigger_path, "w") as deploy_config:
-            deploy_config.write(
-                config_template.format(
-                    environment=environment,
-                    container=container,
-                    tag=tag,
-                    deployment_id=deployment_id,
-                    status_url=status_url,
-                    token=envconfig.authorization_token,
-                )
+    trigger_path = Path(envconfig.triggers_dir, container).with_suffix(
+        ".conf"
+    )
+
+    with open(trigger_path, "w") as deploy_config:
+        deploy_config.write(
+            config_template.format(
+                environment=environment,
+                container=container,
+                tag=tag,
+                deployment_id=deployment_id,
+                status_url=status_url,
+                token=envconfig.authorization_token,
             )
-        time.sleep(60)
 
 
 @app.exception_handler(HTTPException)
