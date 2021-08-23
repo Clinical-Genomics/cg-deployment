@@ -8,8 +8,11 @@ ENV GUNICORN_WORKERS=1
 ENV GUNICORN_THREADS=1
 ENV GUNICORN_BIND="0.0.0.0:8000"
 ENV GUNICORN_TIMEOUT=400
-ENV DB_URI="mongodb://localhost:27017/demo"
-ENV DB_NAME="demo"
+
+ENV AUTHORIZATION_TOKEN="fqojqfjqnoffnqop2e"
+ENV WEBHOOK_TOKEN="fjofj2ofj23o"
+ENV TRIGGERS_DIR="/path/to/triggers/dir"
+ENV ENVIRONMENTS="stage"
 
 EXPOSE 8000
 
@@ -33,4 +36,4 @@ CMD gunicorn \
     --access-logfile - \
     --log-level="debug" \
     --worker-class=uvicorn.workers.UvicornWorker \
-     cg-deployment.app:app
+     cg_deployment:app
