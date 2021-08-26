@@ -87,7 +87,7 @@ async def verify_token(
 async def update_trigger_file(payload: DeploymentPayload) -> None:
     environment = payload.deployment.get("environment")
     container = payload.deployment.get("description")
-    tag = payload.deployment.get("ref")
+    tag = payload.deployment.get("ref", "latest").replace("/", "-")
     deployment_id = payload.deployment.get("id")
     status_url = payload.deployment.get("statuses_url")
     trigger_path = Path(envconfig.triggers_dir, container).with_suffix(".conf")
