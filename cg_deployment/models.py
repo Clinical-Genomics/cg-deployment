@@ -22,4 +22,4 @@ class DeploymentPayload(Payload):
 class StatusPayload(Payload):
     status_url: Optional[str]
     status: Optional[str]
-    environment_url: Optional[str] = ""
+    environment_url: Optional[str]
