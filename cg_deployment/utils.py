@@ -56,11 +56,11 @@ def set_deployment_url(status_url: str, environment_url: Optional[str]) -> None:
         url=status_url,
         data=json.dumps(
             {
-                "environment_url": "https://cg-vm1-deployments.scilifelab.se/docs",
+                "target_url": "https://cg-vm1-deployments.scilifelab.se/docs",
             }
         ),
         headers={
-            "accept": "application/vnd.github.ant-man-preview+json",
+            "accept": "application/vnd.github.v3+json",
             "authorization": f"token {envconfig.authorization_token}",
         },
     )
