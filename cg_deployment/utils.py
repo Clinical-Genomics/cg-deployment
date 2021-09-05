@@ -3,7 +3,7 @@ import hmac
 import json
 import logging
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import requests
 from cg_deployment.config import EnvConfig
@@ -44,6 +44,23 @@ def set_deployment_state(status_url: str, state: str) -> None:
         ),
         headers={
             "accept": content_types.get(state),
+            "authorization": f"token {envconfig.authorization_token}",
+        },
+    )
+    LOG.info(json.loads(response.text))
+
+
+def set_deployment_url(status_url: str, environment_url: Optional[str]) -> None:
+
+    response = requests.post(
+        url=status_url,
+        data=json.dumps(
+            {
+                "environment_url": environment_url,
+            }
+        ),
+        headers={
+            "accept": "application/vnd.github.ant-man-preview+json",
             "authorization": f"token {envconfig.authorization_token}",
         },
     )

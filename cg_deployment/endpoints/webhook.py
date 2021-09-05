@@ -6,6 +6,7 @@ from cg_deployment.models import DeploymentPayload, StatusPayload
 from cg_deployment.utils import (
     get_latest_deployments,
     set_deployment_state,
+    set_deployment_url,
     update_trigger_file,
     verify_signature,
     verify_token,
@@ -41,4 +42,5 @@ async def deployment(payload: DeploymentPayload, request: Request):
 async def status(payload: StatusPayload, request: Request):
     await verify_token(request=request)
     set_deployment_state(status_url=payload.status_url, state=payload.status)
+    set_deployment_url(status_url=payload.status_url, environment_url=payload.environment_url)
     return Response(status_code=200)
