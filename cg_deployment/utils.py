@@ -56,7 +56,7 @@ def set_deployment_url(status_url: str, environment_url: Optional[str]) -> None:
         url=status_url,
         data=json.dumps(
             {
-                "log_url": environment_url,
+                "environment_url": "https://cg-vm1-deployments.scilifelab.se/docs",
             }
         ),
         headers={
