@@ -12,6 +12,9 @@ on:
 jobs:
   create_deployment:
     runs-on: ubuntu-latest
+    environment:
+      name: stage
+      url: 'https://cg-vm1-deployments.scilifelab.se'
     steps:
       - run: |
           curl \
