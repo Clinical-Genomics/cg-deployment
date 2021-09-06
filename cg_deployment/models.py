@@ -10,8 +10,8 @@ class Payload(BaseModel):
 
 
 class DeploymentPayload(Payload):
-    workflow_run: Optional[str]
-    workflow: Optional[str]
+    workflow_run: Optional[Any]
+    workflow: Optional[Any]
     organization: Optional[dict]
     action: Optional[str]
     sender: Optional[dict]
