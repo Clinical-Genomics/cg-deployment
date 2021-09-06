@@ -12,9 +12,6 @@ on:
 jobs:
   create_deployment:
     runs-on: ubuntu-latest
-    environment:
-      name: stage
-      url: 'https://cg-vm1-deployments.scilifelab.se'
     steps:
       - run: |
           curl \
@@ -26,5 +23,6 @@ jobs:
             -d '{
             "ref": "${{ github.event.inputs.branch_name }}",
             "environment": "stage",
+            "environment_url": "https://cg-vm1-deployments.scilifelab.se/",
             "auto_merge": false,
             "description": "${{secrets.DEPLOYMENT_INFO}}"}'
