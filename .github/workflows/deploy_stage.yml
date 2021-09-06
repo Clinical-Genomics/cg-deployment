@@ -15,5 +15,6 @@ jobs:
     environment:
       name: stage
       url: 'https://cg-vm1-deployments.scilifelab.se/docs'
+      description: "cg_deployment"
     steps:
       - run: echo Deplyment to stage submitted
