@@ -60,7 +60,7 @@ def set_deployment_url(status_url: str, environment_url: Optional[str]) -> None:
             }
         ),
         headers={
-            "accept": "application/vnd.github.v3+json",
+            "accept": "application/vnd.github.ant-man-preview+json",
             "authorization": f"token {envconfig.authorization_token}",
         },
     )
