@@ -12,7 +12,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="cg_deployment",
-    version="1.1.1",
+    version="1.1.2",
     description="API for deployment of services via webhooks",
     long_description=long_description,
     long_description_content_type="text/markdown",
