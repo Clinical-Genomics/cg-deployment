@@ -5,6 +5,7 @@ from pydantic import BaseSettings, validator
 
 logging.basicConfig(level=logging.INFO)
 
+
 class EnvConfig(BaseSettings):
     authorization_token: Optional[str]
     webhook_token: Optional[str]

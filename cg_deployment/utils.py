@@ -60,7 +60,10 @@ def get_latest_deployments(payload: DeploymentPayload) -> List[DeploymentPayload
             "authorization": f"token {envconfig.authorization_token}",
         },
     )
-    return [DeploymentPayload(deployment=deployment) for deployment in json.loads(response.text)]
+    return [
+        DeploymentPayload(deployment=deployment)
+        for deployment in json.loads(response.text)
+    ]
 
 
 async def verify_signature(

@@ -31,8 +31,12 @@ async def deployment(payload: DeploymentPayload, request: Request):
         return Response(status_code=200)
     deployments: List[DeploymentPayload] = get_latest_deployments(payload=payload)
     for deployment in deployments:
-        set_deployment_state(status_url=deployment.deployment.get("statuses_url"), state="inactive")
-    set_deployment_state(status_url=payload.deployment.get("statuses_url"), state="in_progress")
+        set_deployment_state(
+            status_url=deployment.deployment.get("statuses_url"), state="inactive"
+        )
+    set_deployment_state(
+        status_url=payload.deployment.get("statuses_url"), state="in_progress"
+    )
     await update_trigger_file(payload=payload)
     return Response(status_code=200)
 
