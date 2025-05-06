@@ -1,8 +1,7 @@
 import logging
 from typing import Optional
 
-from pydantic import validator
-from pydantic_settings import BaseSettings
+from pydantic import BaseSettings, validator
 
 logging.basicConfig(level=logging.INFO)
 
