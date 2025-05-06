@@ -1,6 +1,9 @@
+import logging
 from typing import Optional
 
 from pydantic import BaseSettings, validator
+
+logging.basicConfig(level=logging.INFO)
 
 
 class EnvConfig(BaseSettings):
